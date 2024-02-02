@@ -1,0 +1,76 @@
+1-sudo vi /etc/httpd/conf.modules.d/00-mpm.conf
+
+comment this line because we can't run 2 mpm modules together
+#LoadModule mpm_event_module modules/mod_mpm_event.so
+
+uncomment this line
+LoadModule mpm_worker_module modules/mod_mpm_worker.so
+
+
+
+2-httpd -M | grep rewrite
+
+ rewrite_module (shared)
+
+3-  sudo gedit /etc/httpd/conf/httpd.conf
+
+(a) RewriteEngine On
+
+RewriteCond "%{QUERY_STRING}" "forbidden" [NC] 
+RewriteRule "^/page$" "-" [F]
+
+
+systemctl restart httpd
+
+
+(b) RewriteCond "%{QUERY_STRING}" "(.+)"
+ RewriteRule "(.*)" "$1?"
+ 
+ 
+ systemctl restart httpd
+ 
+ 
+ 
+(c)
+RewriteCond "%{QUERY_STRING}" "val" 
+RewriteRule "^/page1" "/page2" [R]
+
+
+systemctl restart httpd
+
+
+(d)
+RewriteCond "%{QUERY_STRING}" "var=val" 
+RewriteRule "^/path" "^/path/var/val" [R]
+
+
+systemctl restart httpd
+
+
+(e)
+
+RewriteRule "^/example/(.+)/(.+)" "^/something.cgi?arg=$1&other=$2" [R]
+
+
+systemctl restart httpd
+
+
+4- sudo gedit /etc/httpd/conf/httpd.conf
+
+<VirtualHost *:80>
+    ServerName os.iti.gov.eg
+    DocumentRoot "/var/www/html/dir2"
+
+    <Directory "/var/www/html/dir2">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    RewriteEngine On
+    RewriteRule ^/(.*)$ /dir2/$1 [R]
+</VirtualHost>
+
+
+systemctl restart httpd
+

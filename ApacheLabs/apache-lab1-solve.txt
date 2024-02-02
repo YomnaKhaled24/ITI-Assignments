@@ -1,0 +1,88 @@
+1-yum install httpd
+systemctl start httpd
+
+
+2-cd /var/www/html
+
+sudo touch page1.html
+sudo touch page2.html
+
+sudo vi page1.html
+<h1> This is page1 <h1/>
+                <a href="http://localhost/page2.html">Please go to page2<a/>
+
+
+sudo vi page2.html
+   <h1> This is page2 <h1/>  
+   
+                                                           
+3- cd /var/www/html/dir1
+
+sudo vi .htaccess
+
+AuthType Basic
+AuthName "welcom"
+AuthUserFile "/var/www/.htpasswd"
+Require valid-user
+
+
+
+sudo htpasswd -c .htpasswd yomna
+
+
+sudo vi /etc/httpd/conf/httpd.conf
+
+
+<Directory "/var/www">
+    AllowOverride All  -------> replace none with all
+    # Allow open access:
+    Require all granted
+</Directory>
+
+
+systemctl restart httpd
+
+
+
+
+4-  cd /var/www/html
+
+
+sudo htpasswd -c .htpasswd yomna
+
+
+cd /var/www/html/dir2
+
+sudo vi .htaccess
+
+
+<FilesMatch "\.pdf$">
+    AuthType Basic
+    AuthName "Pdf Access"
+    AuthUserFile "/var/www/html/.htpasswd"
+    Require valid-user
+</FilesMatch>
+
+
+sudo vi /etc/httpd/conf/httpd.conf
+
+
+<Directory "/var/www">
+    AllowOverride All  -------> replace none with all
+    # Allow open access:
+    Require all granted
+</Directory>
+
+
+ sudo cp /home/yomna/Downloads/Apache_Lab2.pdf /var/www/html/dir2
+
+sudo vi file.html
+
+<a href="http://localhost/dir2/Apache_Lab2.pdf" download >Download Pdf file</a>
+
+
+systemctl restart httpd
+
+
+
+
